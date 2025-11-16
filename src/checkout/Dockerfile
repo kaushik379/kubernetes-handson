@@ -1,9 +1,12 @@
 # -------- Build Stage --------
-FROM node:20-alpine AS build
+FROM node:20-slim AS build
 WORKDIR /usr/src/app
+
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 COPY package*.json ./
 COPY . .
+
 
 RUN yarn install --frozen-lockfile
 RUN yarn build

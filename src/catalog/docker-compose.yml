@@ -6,7 +6,6 @@ services:
     depends_on:
       catalog-db:
         condition: service_healthy
-        restart: true
     restart: always
     cap_drop:
       - all
@@ -14,10 +13,14 @@ services:
       - no-new-privileges:true
     environment:
       - GIN_MODE=release
-      - reschedule=on-node-failure
-      - RETAIL_CATALOG_PERSISTENCE_PROVIDER=mysql
-      - RETAIL_CATALOG_PERSISTENCE_PASSWORD=${DB_PASSWORD}
-      - RETAIL_CATALOG_PERSISTENCE_ENDPOINT=catalog-db:3306
+
+      # Correct variables expected by the app
+      - RETAIL_CATALOG_DB_HOST=catalog-db
+      - RETAIL_CATALOG_DB_PORT=3306
+      - RETAIL_CATALOG_DB_USER=catalog_user
+      - RETAIL_CATALOG_DB_PASSWORD=qwerty
+      - RETAIL_CATALOG_DB_NAME=catalogdb
+
     ports:
       - "8081:8080"
     healthcheck:
@@ -25,12 +28,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 3
-    develop:
-      watch:
-        - action: rebuild
-          path: .
 
-  # nosemgrep: yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service
   catalog-db:
     image: mariadb:10.9
     hostname: catalog-db
@@ -38,12 +36,10 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - reschedule=on-node-failure
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
-      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=qwerty
       - MYSQL_DATABASE=catalogdb
       - MYSQL_USER=catalog_user
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_PASSWORD=qwerty
     healthcheck:
       test:
         [
@@ -54,7 +50,7 @@ services:
           "localhost",
           "-u",
           "catalog_user",
-          "-p${DB_PASSWORD}",
+          "-pqwerty"
         ]
       interval: 10s
       timeout: 5s
