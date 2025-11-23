@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      serviceAccountName: cart-sa   # IRSA role binding
+      containers:
+      - name: cart
+        image: <ECR_IMAGE_URL>
+        ports:
+          - containerPort: 8080
+        env:
+        - name: SERVER_TOMCAT_ACCESSLOG_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: cart-config
+              key: SERVER_TOMCAT_ACCESSLOG_ENABLED
+
+        - name: RETAIL_CART_PERSISTENCE_PROVIDER
+          valueFrom:
+            configMapKeyRef:
+              name: cart-config
+              key: RETAIL_CART_PERSISTENCE_PROVIDER
+
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: cart-config
+              key: AWS_REGION
+
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
