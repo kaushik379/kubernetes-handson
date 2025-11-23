@@ -1,0 +1,26 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+      ],
+      "Resource": "arn:aws:dynamodb:<REGION>:<ACCOUNT_ID>:table/<YOUR_TABLE_NAME>"
+    }
+  ]
+}
+
+
+#Run this command after replacing variables:
+eksctl create iamserviceaccount \
+  --cluster <CLUSTER_NAME> \
+  --namespace default \
+  --name cart-sa \
+  --attach-policy-arn arn:aws:iam::<ACCOUNT_ID>:policy/cart-dynamodb-policy \
+  --approve
