@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog
+  template:
+    metadata:
+      labels:
+        app: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: <your-ecr-image-url>   # replace with your image
+        ports:
+        - containerPort: 8080
+        env:
+        - name: GIN_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: catalog-config
+              key: GIN_MODE
+
+        - name: RETAIL_CATALOG_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: catalog-config
+              key: RETAIL_CATALOG_DB_HOST
+
+        - name: RETAIL_CATALOG_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: catalog-config
+              key: RETAIL_CATALOG_DB_PORT
+
+        - name: RETAIL_CATALOG_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: catalog-config
+              key: RETAIL_CATALOG_DB_NAME
+
+        - name: RETAIL_CATALOG_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: catalog-secret
+              key: RETAIL_CATALOG_DB_USER
+
+        - name: RETAIL_CATALOG_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: catalog-secret
+              key: RETAIL_CATALOG_DB_PASSWORD
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 15
