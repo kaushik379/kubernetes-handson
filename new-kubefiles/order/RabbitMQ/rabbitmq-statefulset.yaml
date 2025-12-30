@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: rabbitmq
+  namespace: e-commerce
 spec:
   serviceName: rabbitmq
   replicas: 1
@@ -13,6 +14,9 @@ spec:
       labels:
         app: rabbitmq
     spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 999
       containers:
         - name: rabbitmq
           image: rabbitmq:3-management
@@ -23,21 +27,30 @@ spec:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
                 secretKeyRef:
-                  name: orders-secret
+                  name: rabbitmq-secret
                   key: rabbitmq-user
             - name: RABBITMQ_DEFAULT_PASS
               valueFrom:
                 secretKeyRef:
-                  name: rabbitmq-password
+                  name: rabbitmq-secret
+                  key: rabbitmq-password
           volumeMounts:
-            - name: rabbitmq-volume
+            - name: rabbitmq-data
               mountPath: /var/lib/rabbitmq
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
   volumeClaimTemplates:
     - metadata:
-        name: rabbitmq-volume
+        name: rabbitmq-data
       spec:
-        accessModes: ["ReadWriteOnce"]
-        storageClassName: ebs-storage
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: ebs-gp3
         resources:
           requests:
             storage: 20Gi

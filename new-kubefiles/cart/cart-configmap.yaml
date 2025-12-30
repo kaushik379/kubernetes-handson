@@ -2,7 +2,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cart-config
+  namespace: e-commerce
 data:
   SERVER_TOMCAT_ACCESSLOG_ENABLED: "true"
   RETAIL_CART_PERSISTENCE_PROVIDER: "dynamodb"
-  AWS_REGION: "us-east-1"   # update if needed
+  AWS_REGION: "us-east-1"
+  RETAIL_CART_PERSISTENCE_DYNAMODB_TABLE: "Items"  # actual table name
+  RETAIL_CART_PERSISTENCE_DYNAMODB_CREATE_TABLE: "false"  # optional

@@ -1,0 +1,71 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ecommerce-routes
+  namespace: e-commerce
+spec:
+  parentRefs:
+  - name: ecommerce-gateway
+
+  rules:
+  # UI (/ → ui service)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - name: ui
+      port: 8080
+
+  # CART SERVICE (/carts/)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /carts/
+    backendRefs:
+    - name: cart
+      port: 8080
+
+  # ORDERS SERVICE (/orders/)
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /orders/
+    backendRefs:
+    - name: orders
+      port: 8080
+
+  # CATALOG PRODUCTS
+  - matches:
+    - path:
+        type: Exact
+        value: /catalog/products
+    backendRefs:
+    - name: catalog
+      port: 8080
+
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /catalog/products/
+    backendRefs:
+    - name: catalog
+      port: 8080
+
+  # CATALOG SIZE
+  - matches:
+    - path:
+        type: Exact
+        value: /catalog/size
+    backendRefs:
+    - name: catalog
+      port: 8080
+
+  # CATALOG TAGS
+  - matches:
+    - path:
+        type: Exact
+        value: /catalog/tags
+    backendRefs:
+    - name: catalog
+      port: 8080

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: catalog
+  namespace: e-commerce
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
       - name: catalog
-        image: <your-ecr-image-url>   # replace with your image
+        image: public.ecr.aws/u2p7p1b2/e-commerce:catalog-catalog   # replace with your image
         ports:
         - containerPort: 8080
         env:
