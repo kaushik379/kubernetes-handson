@@ -17,4 +17,4 @@ def list_ec2_instances():
             print("-" * 40)
 
 if __name__ == "__main__":
-    list_ec2_instances()
+    list_ec2_instances() 
