@@ -1,0 +1,33 @@
+name: List EC2 Instances
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:   # allows manual trigger
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  list-ec2:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::943143228843:role/GitHubEC2Role
+          aws-region: us-east-1
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install boto3
+
+      - name: Run Python script
+        run: python list_ec2.py
